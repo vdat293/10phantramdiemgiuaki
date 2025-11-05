@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Button</title>
+    <style>
+        /* CSS cho giao diện đơn giản */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+
+        #downloadBtn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* CSS cho Modal (Pop-up) */
+        .modal {
+            display: none;
+            /* Ẩn mặc định */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Nền mờ */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ẩn/Hiện các phần nội dung */
+        .hidden {
+            display: none;
+        }
+
+        /* CSS cho phần trắc nghiệm */
+        .question {
+            margin-bottom: 20px;
+            display: none;
+            /* <-- ẨN TẤT CẢ CÂU HỎI MẶC ĐỊNH */
+        }
+
+        .question.active {
+            display: block;
+            /* <-- CHỈ HIỆN CÂU HỎI CÓ CLASS 'active' */
+        }
+
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        /* CSS cho nút bấm trong modal */
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .modal-buttons button,
+        #submitQuizBtn,
+        #nextQuizBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        #startQuizBtn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #cancelBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #nextQuizBtn {
+            background-color: #17a2b8;
+            /* Màu khác */
+            color: white;
+            margin-top: 15px;
+        }
+
+        #submitQuizBtn {
+            background-color: #007bff;
+            color: white;
+            margin-top: 15px;
+        }
+
+        /* CSS cho phần kết quả */
+        #result-message {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #countdown {
+            font-size: 1.5em;
+            color: #dc3545;
+        }
+
+        #reward-links {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        #reward-links input {
+            width: 70%;
+            padding: 8px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="downloadBtn">DOWNLOAD</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+
+            <div id="initial-choice">
+                <h2>Bạn cần làm trắc nghiệm để lấy link</h2>
+                <p>Bạn có muốn tiếp tục không?</p>
+                <div class="modal-buttons">
+                    <button id="startQuizBtn">Làm trắc nghiệm</button>
+                    <button id="cancelBtn">Thôi, bỏ</button>
+                </div>
+            </div>
+
+            <div id="quiz-container" class="hidden">
+                <h2>Trả lời 5 câu hỏi sau:</h2>
+                <form id="quizForm">
+                    <div class="question">
+                        <p>Câu 1: Họ tên đầy đủ của sốp Đạt là gì?</p>
+                        <label><input type="radio" name="q1" value="a"> a. Nguyễn Vũ Đạt</label>
+                        <label><input type="radio" name="q1" value="b"> b. Nguyễn Đạt</label>
+                        <label><input type="radio" name="q1" value="c"> c. Nguyễn Văn Đạt</label>
+                        <label><input type="radio" name="q1" value="d"> d. Lê Văn Đạt</label>
+                    </div>
+                    <div class="question">
+                        <p>Câu 2: Sinh nhật của sốp Đạt là ?(dd/mm/yyyy)</p>
+                        <label><input type="radio" name="q2" value="a"> a. 09/02/2003</label>
+                        <label><input type="radio" name="q2" value="b"> b. 09/03/2002</label>
+                        <label><input type="radio" name="q2" value="c"> c. 02/09/2003</label>
+                        <label><input type="radio" name="q2" value="d"> d. 03/02/2009</label>
+                    </div>
+                    <div class="question">
+                        <p>Câu 3: Nhóm 8386 ai là người cầm key?</p>
+                        <label><input type="radio" name="q3" value="a"> a. Lê Thái Thịnh</label>
+                        <label><input type="radio" name="q3" value="b"> b. Lê Quốc Thắng</label>
+                        <label><input type="radio" name="q3" value="c"> c. Sốp Đạt</label>
+                        <label><input type="radio" name="q3" value="d"> d. Phạm Hoàng Lộc</label>
+                    </div>
+                    <div class="question">
+                        <p>Câu 4: Trong 3 chiếc xe sau chiếc nào có giá trị cao nhất:</p>
+                        <label><input type="radio" name="q4" value="a"> a. mercedes c300</label>
+                        <label><input type="radio" name="q4" value="b"> b. dream</label>
+                        <label><input type="radio" name="q4" value="c"> c. cup</label>
+                        <label><input type="radio" name="q4" value="d"> d. xe đạp</label>
+                    </div>
+                    <div class="question">
+                        <p>Câu 5: Bạn sẽ cố gắng học tập chứ:</p>
+                        <label><input type="radio" name="q5" value="a"> a. Có, tôi sẽ cố gắng</label>
+                        <label><input type="radio" name="q5" value="b"> b. Thôi lười học làm gì</label>
+                    </div>
+
+                    <button type="button" id="nextQuizBtn" class="hidden">Câu tiếp theo</button>
+                    <button type="submit" id="submitQuizBtn" class="hidden">Hoàn thành</button>
+                </form>
+            </div>
+
+            <div id="result-container" class="hidden">
+                <p id="result-message"></p>
+                <div id="countdown-timer" class="hidden" style="text-align: center;">
+                    <p>Chuẩn bị nhận link sau: <span id="countdown">5</span>s</p>
+                </div>
+                <div id="reward-links" class="hidden">
+                    <h3>Phần thưởng của bạn:</h3>
+
+                    <p><strong>1. Tải file ZIP:</strong></p>
+                    <a href="https://github.com/vdat293/baptap10pttkw/archive/refs/heads/main.zip" target="_blank">
+                        https://github.com/vdat293/baptap10pttkw
+                    </a>
+
+                    <p style="margin-top: 15px;"><strong>2. Dành cho người có GitHub (Copy link clone):</strong></p>
+                    <input type="text" value="git clone https://github.com/vdat293/baptap10pttkw" id="git-link"
+                        readonly>
+                    <button id="copyBtn">Copy</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Lấy các element cần thiết
+        const modal = document.getElementById('myModal');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+
+        const initialChoiceDiv = document.getElementById('initial-choice');
+        const quizContainerDiv = document.getElementById('quiz-container');
+        const resultContainerDiv = document.getElementById('result-container');
+
+        const quizForm = document.getElementById('quizForm');
+
+        // **Phần code mới**
+        const questions = document.querySelectorAll('#quiz-container .question');
+        const nextQuizBtn = document.getElementById('nextQuizBtn');
+        const submitQuizBtn = document.getElementById('submitQuizBtn');
+        let currentQuestionIndex = 0;
+        // **Hết phần code mới**
+
+        const resultMessage = document.getElementById('result-message');
+        const countdownTimer = document.getElementById('countdown-timer');
+        const countdownSpan = document.getElementById('countdown');
+        const rewardLinksDiv = document.getElementById('reward-links');
+        const copyBtn = document.getElementById('copyBtn');
+        const gitLinkInput = document.getElementById('git-link');
+
+        // Mở Modal khi nhấn nút Download
+        downloadBtn.onclick = function () {
+            modal.style.display = 'flex';
+        }
+
+        // Đóng Modal khi nhấn "Thôi, bỏ"
+        cancelBtn.onclick = function () {
+            modal.style.display = 'none';
+        }
+
+        // Bắt đầu làm trắc nghiệm
+        startQuizBtn.onclick = function () {
+            initialChoiceDiv.classList.add('hidden'); // Ẩn lựa chọn
+            quizContainerDiv.classList.remove('hidden'); // Hiện trắc nghiệm
+
+            // Reset về câu hỏi đầu tiên
+            currentQuestionIndex = 0;
+            questions.forEach((question, index) => {
+                if (index === 0) {
+                    question.classList.add('active'); // Hiện câu 1
+                } else {
+                    question.classList.remove('active'); // Ẩn các câu khác
+                }
+            });
+
+            nextQuizBtn.classList.remove('hidden'); // Hiện nút "Tiếp"
+            submitQuizBtn.classList.add('hidden'); // Ẩn nút "Hoàn thành"
+        }
+
+        // **Xử lý nút "Câu tiếp theo"**
+        nextQuizBtn.onclick = function () {
+            // Kiểm tra xem đã chọn đáp án chưa
+            const currentQuestion = questions[currentQuestionIndex];
+            const selectedAnswer = currentQuestion.querySelector('input[type="radio"]:checked');
+
+            if (!selectedAnswer) {
+                alert("Bạn phải chọn một đáp án!");
+                return; // Dừng lại nếu chưa chọn
+            }
+
+            // Ẩn câu hiện tại
+            currentQuestion.classList.remove('active');
+
+            // Tăng chỉ số
+            currentQuestionIndex++;
+
+            // Hiện câu tiếp theo
+            questions[currentQuestionIndex].classList.add('active');
+
+            // Kiểm tra nếu đây là câu cuối cùng (câu 5)
+            if (currentQuestionIndex === questions.length - 1) {
+                nextQuizBtn.classList.add('hidden'); // Ẩn nút "Tiếp"
+                submitQuizBtn.classList.remove('hidden'); // Hiện nút "Hoàn thành"
+            }
+        }
+
+        // Xử lý khi nộp form (Nút "Hoàn thành")
+        quizForm.onsubmit = function (event) {
+            event.preventDefault(); // Ngăn form tải lại trang
+
+            // Chỉ kiểm tra câu 5
+            const q5Answer = document.querySelector('input[name="q5"]:checked');
+
+            if (!q5Answer) {
+                alert("Bạn phải trả lời câu 5!");
+                return;
+            }
+
+            const answerValue = q5Answer.value;
+
+            // Ẩn trắc nghiệm và hiện kết quả
+            quizContainerDiv.classList.add('hidden');
+            resultContainerDiv.classList.remove('hidden');
+
+            // Reset trắc nghiệm (phòng khi người dùng tắt modal và mở lại)
+            questions[currentQuestionIndex].classList.remove('active');
+            currentQuestionIndex = 0;
+
+            if (answerValue === 'a') {
+                // Nếu trả lời "Có"
+                resultMessage.textContent = "Tuyệt vời! Chúc bạn học tốt!";
+                resultMessage.style.color = 'green'; // Thêm màu
+                countdownTimer.classList.remove('hidden');
+                startCountdown();
+            } else {
+                // Nếu trả lời "Không"
+                resultMessage.style.color = 'red';
+                resultMessage.textContent = "Nếu không cố gắng lấy bài tập làm gì, đối phó à?";
+            }
+        }
+
+        // Hàm đếm ngược
+        function startCountdown() {
+            let seconds = 5;
+            countdownSpan.textContent = seconds;
+
+            const interval = setInterval(() => {
+                seconds--;
+                countdownSpan.textContent = seconds;
+
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    countdownTimer.classList.add('hidden'); // Ẩn đồng hồ
+                    rewardLinksDiv.classList.remove('hidden'); // Hiện link
+                }
+            }, 1000);
+        }
+
+        // Xử lý nút copy
+        copyBtn.onclick = function () {
+            gitLinkInput.select(); // Chọn text trong input
+
+            // Dùng API Clipboard mới (an toàn hơn)
+            navigator.clipboard.writeText(gitLinkInput.value).then(() => {
+                copyBtn.textContent = 'Đã Copy!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy';
+                }, 2000); // Reset chữ sau 2 giây
+            }).catch(err => {
+                console.error('Không thể copy: ', err);
+                // Fallback cho trình duyệt cũ
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = 'Đã Copy!';
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                    }, 2000);
+                } catch (e) {
+                    alert('Không thể tự động copy, vui lòng copy thủ công.');
+                }
+            });
+        }
+
+        // Đóng modal khi nhấn ra ngoài
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+
+                // Reset luôn khi đóng modal
+                initialChoiceDiv.classList.remove('hidden');
+                quizContainerDiv.classList.add('hidden');
+                resultContainerDiv.classList.add('hidden');
+                countdownTimer.classList.add('hidden');
+                rewardLinksDiv.classList.add('hidden');
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
