@@ -128,6 +128,20 @@
             margin-top: 15px;
         }
 
+        #answer-feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #answer-feedback.correct {
+            color: #28a745;
+        }
+
+        #answer-feedback.incorrect {
+            color: #dc3545;
+        }
+
         /* CSS cho phần kết quả */
         #result-message {
             font-size: 1.2em;
@@ -175,38 +189,41 @@
                 <form id="quizForm">
                     <div class="question">
                         <p>Câu 1: Họ tên đầy đủ của sốp Đạt là gì?</p>
-                        <label><input type="radio" name="q1" value="a"> a. Nguyễn Vũ Đạt</label>
-                        <label><input type="radio" name="q1" value="b"> b. Nguyễn Đạt</label>
-                        <label><input type="radio" name="q1" value="c"> c. Nguyễn Văn Đạt</label>
-                        <label><input type="radio" name="q1" value="d"> d. Lê Văn Đạt</label>
+                        <label><input type="radio" name="q1" value="a" data-correct="true"> A. Nguyễn Vũ Đạt</label>
+                        <label><input type="radio" name="q1" value="b"> B. Nguyễn Đạt</label>
+                        <label><input type="radio" name="q1" value="c"> C. Nguyễn Văn Đạt</label>
+                        <label><input type="radio" name="q1" value="d"> D. Lê Văn Đạt</label>
                     </div>
                     <div class="question">
-                        <p>Câu 2: Sinh nhật của sốp Đạt là ?(dd/mm/yyyy)</p>
-                        <label><input type="radio" name="q2" value="a"> a. 09/02/2003</label>
-                        <label><input type="radio" name="q2" value="b"> b. 09/03/2002</label>
-                        <label><input type="radio" name="q2" value="c"> c. 02/09/2003</label>
-                        <label><input type="radio" name="q2" value="d"> d. 03/02/2009</label>
+                        <p>Câu 2: Sinh nhật của sốp Đạt là? (dd/mm/yyyy)</p>
+                        <label><input type="radio" name="q2" value="a"> A. 09/02/2003</label>
+                        <label><input type="radio" name="q2" value="b"> B. 09/03/2002</label>
+                        <label><input type="radio" name="q2" value="c" data-correct="true"> C. 02/09/2003</label>
+                        <label><input type="radio" name="q2" value="d"> D. 03/02/2009</label>
                     </div>
                     <div class="question">
                         <p>Câu 3: Nhóm 8386 ai là người cầm key?</p>
-                        <label><input type="radio" name="q3" value="a"> a. Lê Thái Thịnh</label>
-                        <label><input type="radio" name="q3" value="b"> b. Lê Quốc Thắng</label>
-                        <label><input type="radio" name="q3" value="c"> c. Sốp Đạt</label>
-                        <label><input type="radio" name="q3" value="d"> d. Phạm Hoàng Lộc</label>
+                        <label><input type="radio" name="q3" value="a" data-correct="true"> A. Lê Thái Thịnh</label>
+                        <label><input type="radio" name="q3" value="b"> B. Lê Quốc Thắng</label>
+                        <label><input type="radio" name="q3" value="c"> C. Sốp Đạt</label>
+                        <label><input type="radio" name="q3" value="d"> D. Phạm Hoàng Lộc</label>
                     </div>
                     <div class="question">
                         <p>Câu 4: Trong 3 chiếc xe sau chiếc nào có giá trị cao nhất:</p>
-                        <label><input type="radio" name="q4" value="a"> a. mercedes c300</label>
-                        <label><input type="radio" name="q4" value="b"> b. dream</label>
-                        <label><input type="radio" name="q4" value="c"> c. cup</label>
-                        <label><input type="radio" name="q4" value="d"> d. xe đạp</label>
+                        <label><input type="radio" name="q4" value="a" data-correct="true"> A. Mercedes-Benz C
+                            300</label>
+                        <label><input type="radio" name="q4" value="b"> B. Honda Dream</label>
+                        <label><input type="radio" name="q4" value="c"> C. Honda Cub</label>
+                        <label><input type="radio" name="q4" value="d"> D. Xe đạp cao cấp</label>
                     </div>
                     <div class="question">
                         <p>Câu 5: Bạn sẽ cố gắng học tập chứ:</p>
-                        <label><input type="radio" name="q5" value="a"> a. Có, tôi sẽ cố gắng</label>
-                        <label><input type="radio" name="q5" value="b"> b. Thôi lười học làm gì</label>
+                        <label><input type="radio" name="q5" value="a" data-correct="true"> A. Có, tôi sẽ cố
+                            gắng</label>
+                        <label><input type="radio" name="q5" value="b"> B. Thôi lười học làm gì</label>
                     </div>
 
+                    <p id="answer-feedback" class="hidden"></p>
                     <button type="button" id="nextQuizBtn" class="hidden">Câu tiếp theo</button>
                     <button type="submit" id="submitQuizBtn" class="hidden">Hoàn thành</button>
                 </form>
@@ -247,13 +264,9 @@
         const resultContainerDiv = document.getElementById('result-container');
 
         const quizForm = document.getElementById('quizForm');
-
-        // **Phần code mới**
         const questions = document.querySelectorAll('#quiz-container .question');
         const nextQuizBtn = document.getElementById('nextQuizBtn');
         const submitQuizBtn = document.getElementById('submitQuizBtn');
-        let currentQuestionIndex = 0;
-        // **Hết phần code mới**
 
         const resultMessage = document.getElementById('result-message');
         const countdownTimer = document.getElementById('countdown-timer');
@@ -261,68 +274,92 @@
         const rewardLinksDiv = document.getElementById('reward-links');
         const copyBtn = document.getElementById('copyBtn');
         const gitLinkInput = document.getElementById('git-link');
+        const answerFeedback = document.getElementById('answer-feedback');
+
+        const QUIZ_STATE_KEY = 'quizResultState';
+        const QUIZ_STATUS_SUCCESS = 'success';
+        const QUIZ_STATUS_BAD = 'bad';
+
+        let currentQuestionIndex = 0;
+        let countdownInterval = null;
 
         // Mở Modal khi nhấn nút Download
         downloadBtn.onclick = function () {
             modal.style.display = 'flex';
-        }
+            const savedState = getSavedQuizState();
+
+            if (savedState === QUIZ_STATUS_SUCCESS) {
+                showSuccessResult(true);
+            } else if (savedState === QUIZ_STATUS_BAD) {
+                showPermanentFailureMessage();
+            } else {
+                showInitialChoice();
+            }
+        };
 
         // Đóng Modal khi nhấn "Thôi, bỏ"
         cancelBtn.onclick = function () {
-            modal.style.display = 'none';
-        }
+            closeModal();
+        };
 
         // Bắt đầu làm trắc nghiệm
         startQuizBtn.onclick = function () {
-            initialChoiceDiv.classList.add('hidden'); // Ẩn lựa chọn
-            quizContainerDiv.classList.remove('hidden'); // Hiện trắc nghiệm
+            if (getSavedQuizState() === QUIZ_STATUS_BAD) {
+                showPermanentFailureMessage();
+                return;
+            }
+            startQuiz();
+        };
 
-            // Reset về câu hỏi đầu tiên
-            currentQuestionIndex = 0;
-            questions.forEach((question, index) => {
-                if (index === 0) {
-                    question.classList.add('active'); // Hiện câu 1
-                } else {
-                    question.classList.remove('active'); // Ẩn các câu khác
-                }
-            });
-
-            nextQuizBtn.classList.remove('hidden'); // Hiện nút "Tiếp"
-            submitQuizBtn.classList.add('hidden'); // Ẩn nút "Hoàn thành"
-        }
-
-        // **Xử lý nút "Câu tiếp theo"**
+        // Xử lý nút "Câu tiếp theo"
         nextQuizBtn.onclick = function () {
-            // Kiểm tra xem đã chọn đáp án chưa
             const currentQuestion = questions[currentQuestionIndex];
             const selectedAnswer = currentQuestion.querySelector('input[type="radio"]:checked');
 
             if (!selectedAnswer) {
                 alert("Bạn phải chọn một đáp án!");
-                return; // Dừng lại nếu chưa chọn
+                return;
             }
 
-            // Ẩn câu hiện tại
-            currentQuestion.classList.remove('active');
+            const questionNumber = currentQuestionIndex + 1;
+            const correctInput = currentQuestion.querySelector('input[data-correct="true"]');
 
-            // Tăng chỉ số
+            answerFeedback.classList.remove('correct', 'incorrect');
+
+            if (correctInput) {
+                const correctLabel = correctInput.closest('label');
+                const correctText = correctLabel ? correctLabel.textContent.trim() : 'đáp án đúng';
+
+                if (selectedAnswer === correctInput) {
+                    answerFeedback.textContent = `Câu ${questionNumber}: Chính xác!`;
+                    answerFeedback.classList.add('correct');
+                } else {
+                    answerFeedback.textContent = `Câu ${questionNumber}: Sai rồi. Đáp án đúng là ${correctText}.`;
+                    answerFeedback.classList.add('incorrect');
+                }
+            } else {
+                answerFeedback.textContent = `Câu ${questionNumber}: Đáp án đã được ghi nhận.`;
+            }
+
+            answerFeedback.classList.remove('hidden');
+
+            currentQuestion.classList.remove('active');
             currentQuestionIndex++;
 
-            // Hiện câu tiếp theo
-            questions[currentQuestionIndex].classList.add('active');
-
-            // Kiểm tra nếu đây là câu cuối cùng (câu 5)
-            if (currentQuestionIndex === questions.length - 1) {
-                nextQuizBtn.classList.add('hidden'); // Ẩn nút "Tiếp"
-                submitQuizBtn.classList.remove('hidden'); // Hiện nút "Hoàn thành"
+            if (currentQuestionIndex < questions.length) {
+                showQuestion(currentQuestionIndex);
             }
-        }
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextQuizBtn.classList.add('hidden');
+                submitQuizBtn.classList.remove('hidden');
+            }
+        };
 
         // Xử lý khi nộp form (Nút "Hoàn thành")
         quizForm.onsubmit = function (event) {
-            event.preventDefault(); // Ngăn form tải lại trang
+            event.preventDefault();
 
-            // Chỉ kiểm tra câu 5
             const q5Answer = document.querySelector('input[name="q5"]:checked');
 
             if (!q5Answer) {
@@ -330,59 +367,46 @@
                 return;
             }
 
-            const answerValue = q5Answer.value;
+            nextQuizBtn.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
 
-            // Ẩn trắc nghiệm và hiện kết quả
-            quizContainerDiv.classList.add('hidden');
-            resultContainerDiv.classList.remove('hidden');
-
-            // Reset trắc nghiệm (phòng khi người dùng tắt modal và mở lại)
-            questions[currentQuestionIndex].classList.remove('active');
-            currentQuestionIndex = 0;
-
-            if (answerValue === 'a') {
-                // Nếu trả lời "Có"
-                resultMessage.textContent = "Tuyệt vời! Chúc bạn học tốt!";
-                resultMessage.style.color = 'green'; // Thêm màu
-                countdownTimer.classList.remove('hidden');
-                startCountdown();
+            if (q5Answer.value === 'a') {
+                setQuizState(QUIZ_STATUS_SUCCESS);
+                showSuccessResult(false);
             } else {
-                // Nếu trả lời "Không"
-                resultMessage.style.color = 'red';
-                resultMessage.textContent = "Nếu không cố gắng lấy bài tập làm gì, đối phó à?";
+                setQuizState(QUIZ_STATUS_BAD);
+                showPermanentFailureMessage();
             }
-        }
+        };
 
         // Hàm đếm ngược
         function startCountdown() {
             let seconds = 5;
             countdownSpan.textContent = seconds;
 
-            const interval = setInterval(() => {
+            countdownInterval = setInterval(() => {
                 seconds--;
                 countdownSpan.textContent = seconds;
 
                 if (seconds <= 0) {
-                    clearInterval(interval);
-                    countdownTimer.classList.add('hidden'); // Ẩn đồng hồ
-                    rewardLinksDiv.classList.remove('hidden'); // Hiện link
+                    clearCountdown();
+                    countdownTimer.classList.add('hidden');
+                    rewardLinksDiv.classList.remove('hidden');
                 }
             }, 1000);
         }
 
         // Xử lý nút copy
         copyBtn.onclick = function () {
-            gitLinkInput.select(); // Chọn text trong input
+            gitLinkInput.select();
 
-            // Dùng API Clipboard mới (an toàn hơn)
             navigator.clipboard.writeText(gitLinkInput.value).then(() => {
                 copyBtn.textContent = 'Đã Copy!';
                 setTimeout(() => {
                     copyBtn.textContent = 'Copy';
-                }, 2000); // Reset chữ sau 2 giây
+                }, 2000);
             }).catch(err => {
                 console.error('Không thể copy: ', err);
-                // Fallback cho trình duyệt cũ
                 try {
                     document.execCommand('copy');
                     copyBtn.textContent = 'Đã Copy!';
@@ -393,20 +417,122 @@
                     alert('Không thể tự động copy, vui lòng copy thủ công.');
                 }
             });
-        }
+        };
 
         // Đóng modal khi nhấn ra ngoài
         window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-
-                // Reset luôn khi đóng modal
-                initialChoiceDiv.classList.remove('hidden');
-                quizContainerDiv.classList.add('hidden');
-                resultContainerDiv.classList.add('hidden');
-                countdownTimer.classList.add('hidden');
-                rewardLinksDiv.classList.add('hidden');
+            if (event.target === modal) {
+                closeModal();
             }
+        };
+
+        function startQuiz() {
+            resetQuizFormState();
+            initialChoiceDiv.classList.add('hidden');
+            resultContainerDiv.classList.add('hidden');
+            rewardLinksDiv.classList.add('hidden');
+            countdownTimer.classList.add('hidden');
+            quizContainerDiv.classList.remove('hidden');
+
+            showQuestion(0);
+            nextQuizBtn.classList.remove('hidden');
+            submitQuizBtn.classList.add('hidden');
+        }
+
+        function showQuestion(index) {
+            questions.forEach((question, idx) => {
+                question.classList.toggle('active', idx === index);
+            });
+        }
+
+        function resetQuizFormState() {
+            quizForm.reset();
+            questions.forEach(question => question.classList.remove('active'));
+            currentQuestionIndex = 0;
+            answerFeedback.textContent = '';
+            answerFeedback.classList.add('hidden');
+            answerFeedback.classList.remove('correct', 'incorrect');
+        }
+
+        function showInitialChoice() {
+            clearCountdown();
+            resetQuizFormState();
+            initialChoiceDiv.classList.remove('hidden');
+            quizContainerDiv.classList.add('hidden');
+            resultContainerDiv.classList.add('hidden');
+            rewardLinksDiv.classList.add('hidden');
+            countdownTimer.classList.add('hidden');
+            nextQuizBtn.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
+            resultMessage.textContent = '';
+            resultMessage.style.color = '';
+        }
+
+        function showSuccessResult(skipCountdown) {
+            clearCountdown();
+            initialChoiceDiv.classList.add('hidden');
+            quizContainerDiv.classList.add('hidden');
+            resultContainerDiv.classList.remove('hidden');
+            nextQuizBtn.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
+
+            resultMessage.style.color = 'green';
+            resultMessage.textContent = skipCountdown
+                ? "Bạn đã hoàn thành trắc nghiệm trước đó. Đây là link tải dành cho bạn."
+                : "Tuyệt vời! Chúc bạn học tốt!";
+
+            if (skipCountdown) {
+                countdownTimer.classList.add('hidden');
+                rewardLinksDiv.classList.remove('hidden');
+            } else {
+                rewardLinksDiv.classList.add('hidden');
+                countdownTimer.classList.remove('hidden');
+                startCountdown();
+            }
+        }
+
+        function showPermanentFailureMessage() {
+            clearCountdown();
+            initialChoiceDiv.classList.add('hidden');
+            quizContainerDiv.classList.add('hidden');
+            resultContainerDiv.classList.remove('hidden');
+            nextQuizBtn.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
+
+            resultMessage.style.color = 'red';
+            resultMessage.textContent = "Không cố gắng thì lấy bài làm gì, đối phó à!!!!!";
+            countdownTimer.classList.add('hidden');
+            rewardLinksDiv.classList.add('hidden');
+        }
+
+        function getSavedQuizState() {
+            return localStorage.getItem(QUIZ_STATE_KEY);
+        }
+
+        function setQuizState(state) {
+            localStorage.setItem(QUIZ_STATE_KEY, state);
+        }
+
+        function clearCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            clearCountdown();
+            resetQuizFormState();
+            rewardLinksDiv.classList.add('hidden');
+            countdownTimer.classList.add('hidden');
+            resultMessage.textContent = '';
+            resultMessage.style.color = '';
+            nextQuizBtn.classList.add('hidden');
+            submitQuizBtn.classList.add('hidden');
+            initialChoiceDiv.classList.add('hidden');
+            quizContainerDiv.classList.add('hidden');
+            resultContainerDiv.classList.add('hidden');
         }
 
     </script>
